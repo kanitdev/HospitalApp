@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -49,6 +50,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.firebase.database)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -56,4 +58,24 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    //Navigation
+    implementation(libs.androidx.navigation.compose)
+    //Firebase BoM
+    implementation(platform(libs.firebase.bom))
+    //Firebase-Analytics
+    implementation(libs.firebase.analytics)
+    // Firebase Auth
+    implementation (libs.firebase.auth)
+    // Firebase Phone Auth
+    implementation(libs.firebase.auth.ktx)
+    //Live Data
+    implementation (libs.androidx.runtime.livedata)
+    implementation (libs.androidx.lifecycle.livedata.ktx)
+    //google play services
+    implementation (libs.play.services.auth)
+    //// Required for testing Navigation components
+    androidTestImplementation ("androidx.navigation:navigation-testing:2.9.0")
+
+
 }
