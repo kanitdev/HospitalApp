@@ -19,7 +19,6 @@ class AuthViewModel : ViewModel() {
     private val _authState = MutableLiveData<AuthState>()
     val authState: LiveData<AuthState> = _authState
 
-    // OTP related properties
     private var storedVerificationId: String? = null
     private var resendToken: PhoneAuthProvider.ForceResendingToken? = null
 
@@ -38,8 +37,7 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun login(email: String, password: String) {
-
+    fun login(email: String, password: String, onLoginComplete: ((Boolean) -> Unit)? = null) {
         if (email.isEmpty() || password.isEmpty()) {
             _authState.value = AuthState.Error("Email and password cannot be empty")
             return
@@ -49,6 +47,22 @@ class AuthViewModel : ViewModel() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     _authState.value = AuthState.Authenticated
+
+                    // Check if user data exists in database to determine if it's first-time login
+                    val userId = auth.currentUser?.uid
+                    if (userId != null && onLoginComplete != null) {
+                        FirebaseRepo.getUserData(
+                            userId = userId,
+                            onSuccess = { userData ->
+                                // User data exists, not first-time login
+                                onLoginComplete(false)
+                            },
+                            onFailure = { error ->
+                                // User data doesn't exist, it's first-time login
+                                onLoginComplete(true)
+                            }
+                        )
+                    }
                 } else {
                     _authState.value = AuthState.Error(task.exception?.message ?: "Login failed")
                 }
@@ -71,7 +85,7 @@ class AuthViewModel : ViewModel() {
 
         _authState.value = AuthState.Loading
 
-        // First create Firebase Auth account
+      //account creation
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {

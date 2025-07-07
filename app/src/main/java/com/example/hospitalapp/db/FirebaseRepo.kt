@@ -34,4 +34,34 @@ object FirebaseRepo {
         }
     }
 
+    fun getUserData(userId: String, onSuccess: (SignUpData) -> Unit, onFailure: (String) -> Unit) {
+        try {
+            Log.d("FirebaseRepo", "Attempting to get user data for ID: $userId")
+            db.orderByChild("email").equalTo("\${userId}@hospitalapp.com").get()
+                .addOnSuccessListener { snapshot ->
+                    if (snapshot.exists()) {
+                        val userData =
+                            snapshot.children.firstOrNull()?.getValue(SignUpData::class.java)
+                        if (userData != null) {
+                            Log.d("FirebaseRepo", "User data found")
+                            onSuccess(userData)
+                        } else {
+                            Log.d("FirebaseRepo", "User data not found")
+                            onFailure("User data not found")
+                        }
+                    } else {
+                        Log.d("FirebaseRepo", "No user data exists")
+                        onFailure("No user data exists")
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("FirebaseRepo", "Failed to get user data", exception)
+                    onFailure(exception.message ?: "Failed to get user data")
+                }
+        } catch (e: Exception) {
+            Log.e("FirebaseRepo", "Exception in getUserData", e)
+            onFailure("Exception occurred: \${e.message}")
+        }
+    }
+
 }

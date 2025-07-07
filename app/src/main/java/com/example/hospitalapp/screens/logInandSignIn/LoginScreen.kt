@@ -49,7 +49,7 @@ import com.example.hospitalapp.viewmodels.AuthViewModel
 
 
 @Composable
-fun LoginScreen(modifier: Modifier, navController: NavController, authViewModel: AuthViewModel) {
+fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
 
     var input by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -236,10 +236,13 @@ fun LoginScreen(modifier: Modifier, navController: NavController, authViewModel:
                     .padding(bottom = 16.dp),
                 elevation = ButtonDefaults.buttonElevation(8.dp),
                 onClick = {
-                    authViewModel.login(input, password)
-
-                    navController.navigate("healthInformation")
-
+                    authViewModel.login(input, password) { isFirstTimeLogin ->
+                        if (isFirstTimeLogin) {
+                            navController.navigate("languageScreen")
+                        } else {
+                            navController.navigate("healthInformation")
+                        }
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFFD53F8C),
